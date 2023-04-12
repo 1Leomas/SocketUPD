@@ -28,8 +28,6 @@ internal class ChatUDP
 
         _send = new Send(_sender);
 
-        //Console.WriteLine(_sender.);
-
         _receiver = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
         _port = port;
@@ -44,7 +42,7 @@ internal class ChatUDP
     public void Bind()
     {
         var localIP = new IPEndPoint(IPAddress.Any, _port);
-        //need Bind to clientName data
+
         _receiver.Bind(localIP);
 
         Console.WriteLine("Listening on {0}", localIP);
@@ -65,21 +63,8 @@ internal class ChatUDP
         {
             lock (_identity)
             {
-                //Console.Write(">>");
                 PrintClientMessage(_client.NickName, _client.ConsoleColor);
             }
-            
-            /*while (true)
-            {
-                var inputKey = Console.ReadKey();
-                
-                if (inputKey.Key == ConsoleKey.Enter)
-                {
-                    if (_input.Length != 0) Console.WriteLine();
-                    break;
-                }
-                _input.Append(inputKey.KeyChar);
-            }*/
 
             _input.Append(Console.ReadLine() ?? "");
 
@@ -104,8 +89,6 @@ internal class ChatUDP
 
     private void SendToSpecificClient()
     {
-        // @sam buna cf?
-
         var name = _input.ToString().Split().First().Remove(0, 1);
         var message = _input.ToString().Replace($"@{name} ", "");
 
@@ -117,8 +100,6 @@ internal class ChatUDP
 
         var byteToSend = Encoding.UTF8.GetBytes
             ($"{MessageType.PRIVATE_MESSAGE}:{_client.NickName}:{_client.ConsoleColor}:{message}");
-
-        //EndPoint remotePoint = new IPEndPoint(IPAddress.Broadcast, _port);
 
         var ipAdress = IPAddress.Parse(remotePoint.ToString().Split(':').First()).ToString();
         EndPoint remoteEP = new IPEndPoint(IPAddress.Parse(ipAdress), _port);
@@ -138,10 +119,6 @@ internal class ChatUDP
 
                 if (ItsMe(remoteIp)) continue;
 
-                //aici ar trebui sa se transmite intr-un stack
-                //pentru a evita erori cand primim doua mesaje 
-                //concomitent
-                
                 lock (_identity)
                 {
                     ProcessMessagesByType(byteReceive, remoteIp);
@@ -176,7 +153,6 @@ internal class ChatUDP
                 Console.Write(new string(' ', Console.WindowWidth));
                 Console.SetCursorPosition(0, cp.Top);
 
-                //Console.Write("<<");
                 ConsoleColor color = Enum.Parse<ConsoleColor>(receiveList[2]);
                 PrintClientMessage(receiveList[1], color, receiveList[3]);
 
@@ -191,7 +167,6 @@ internal class ChatUDP
                 Console.Write(new string(' ', Console.WindowWidth));
                 Console.SetCursorPosition(0, cp.Top);
 
-                //Console.Write("::");
                 ConsoleColor color = Enum.Parse<ConsoleColor>(receiveList[2]);
                 PrintPrivateMessage(receiveList[1], color, receiveList[3]);
                 break;
@@ -215,8 +190,6 @@ internal class ChatUDP
             case MessageType.DISCONECTED: // В:n:c
             {
                 var result = RemoveClientFromList(receiveList[1], remoteIp);
-
-                //if (result) Console.WriteLine("log: Client don't exits in the list");
 
                 var cp = Console.GetCursorPosition();
                 Console.SetCursorPosition(0, cp.Top);
@@ -252,9 +225,7 @@ internal class ChatUDP
         {
             if (!ItsMe(remoteIp))
             {
-                var result = _clients.TryAdd(clientName, remoteIp);
-
-                //if (result) Console.WriteLine("log: Client added to the list");
+                _clients.TryAdd(clientName, remoteIp);
             }
         });
     }
