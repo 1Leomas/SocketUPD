@@ -59,6 +59,7 @@ internal class ChatUDP
     public void Send()
     {
         Console.WriteLine("Input message and press ENTER");
+        Console.WriteLine("For private messages use this format: @userName yourMessage");
         while (true)
         {
             lock (_identity)
@@ -205,10 +206,8 @@ internal class ChatUDP
             }
         }
 
-        if (_input.Length > 0)
-            PrintClientMessage(_client.NickName, _client.ConsoleColor, _input.ToString());
-        else
-            PrintClientMessage(_client.NickName, _client.ConsoleColor);
+        if (_input.Length > 0) PrintClientMessage(_client.NickName, _client.ConsoleColor, _input.ToString());
+        else PrintClientMessage(_client.NickName, _client.ConsoleColor);
 
 
 
